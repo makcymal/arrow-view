@@ -9,14 +9,7 @@ struct RuntimeConfig {
   short head_rows = 0;
   bool describe = false, info = false;
 
+  RuntimeConfig(int argc, char *argv[]);
 
-  void print() {
-    std::cout << "Arrow file: " << arrow_file << std::endl
-              << "head_rows: " << head_rows << std::endl
-              << "describe: " << describe << std::endl
-              << "info: " << info << std::endl;
-  }
+  void print();
 };
-
-
-RuntimeConfig ParseRuntimeConfig(int argc, char *argv[]);
