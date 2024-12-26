@@ -16,7 +16,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
 project(arrow-view
   VERSION 0.1.0
   DESCRIPTION "CLI preview of Apache Arrow files"
-  LANGUAGES CXX  
+  LANGUAGES CXX
 )
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -35,21 +35,12 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
-# External packages
+# External libraries
 
 find_package(Arrow REQUIRED)
-find_package(Boost REQUIRED COMPONENTS program_options)
 
 
 # executable targets
 
-file(GLOB
-  arrow_view_IMPL
-  CONFIGURE_DEPENDS
-  "src/lib/tabulate.hpp"
-  "src/impl/*.h"
-  "src/impl/*.cc"
-)
-
-add_executable(arrow-view src/arrow_view.cc ${arrow_view_IMPL})
-target_link_libraries(arrow-view PRIVATE Arrow::arrow_shared ${Boost_LIBRARIES})
+add_executable(arrow-head src/arrow_head.cc src/utils.cc src/utils.h)
+target_link_libraries(arrow-head PRIVATE Arrow::arrow_shared)

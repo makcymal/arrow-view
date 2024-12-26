@@ -54,6 +54,7 @@ bin/
 .build/
 .cmake/
 .ignore/
+*.ignore*
 src/lib
 
 *[Cc][Mm]ake*
@@ -62,5 +63,8 @@ src/lib
 test.*
 *.arrow
 
-arrow-view
+arrow-head
+arrow-tail
+arrow-info
+arrow-desc
 
