@@ -8,7 +8,7 @@ if(NOT CMAKE_BINARY_DIR STREQUAL ${CMAKE_SOURCE_DIR}/.cmake)
 endif()
 
 # set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../.build)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/..)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/../.build)
 
 
 # Project
@@ -26,7 +26,7 @@ endif()
 
 # Setting up C++
 
-set(CMAKE_CXX_FLAGS "-Wall")
+set(CMAKE_CXX_FLAGS "-Wall -Werror")
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
@@ -44,3 +44,10 @@ find_package(Arrow REQUIRED)
 
 add_executable(arrow-head src/arrow_head.cc src/utils.cc src/utils.h)
 target_link_libraries(arrow-head PRIVATE Arrow::arrow_shared)
+
+add_executable(arrow-info src/arrow_info.cc src/utils.cc src/utils.h)
+target_link_libraries(arrow-info PRIVATE Arrow::arrow_shared)
+target_link_libraries(arrow-head PRIVATE Arrow::arrow_shared)
+
+add_executable(arrow-desc src/arrow_desc.cc src/utils.cc src/utils.h)
+target_link_libraries(arrow-desc PRIVATE Arrow::arrow_shared)

@@ -1,9 +1,7 @@
-#include <arrow/api.h>
-#include <arrow/array/array_base.h>
+#include <arrow/array.h>
 #include <arrow/result.h>
 #include <arrow/status.h>
-#include <arrow/type.h>
-#include <arrow/type_fwd.h>
+#include <arrow/table.h>
 
 #include <cmath>
 #include <iostream>
@@ -60,7 +58,7 @@ arrow::Status WriteContents(
       table.add_row(row_stream);
     }
   }
-  
+
   return arrow::Status::OK();
 }
 

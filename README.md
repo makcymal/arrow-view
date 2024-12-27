@@ -1,4 +1,4 @@
-# arrow-view: CLI preview of Apache Arrow files
+# CLI preview of Apache Arrow files
 
 This provides a way of previewing data similar to `head()`, `describe()`, `info()` of `pandas.DataFrame`.
 
