@@ -10,6 +10,15 @@ BUILD_DIR=$SOURCE_DIR/.build
 
 INSTALL_DIR=/usr/local/bin
 
-sudo cp $BUILD_DIR/arrow-head $INSTALL_DIR/arrow-head
-sudo cp $BUILD_DIR/arrow-info $INSTALL_DIR/arrow-info
-sudo cp $BUILD_DIR/arrow-desc $INSTALL_DIR/arrow-desc
+if [[ $EUID == 0 ]]; then
+  cp $BUILD_DIR/arrow-head $INSTALL_DIR/arrow-head
+  cp $BUILD_DIR/arrow-info $INSTALL_DIR/arrow-info
+  cp $BUILD_DIR/arrow-desc $INSTALL_DIR/arrow-desc
+else
+  sudo cp $BUILD_DIR/arrow-head $INSTALL_DIR/arrow-head
+  sudo cp $BUILD_DIR/arrow-info $INSTALL_DIR/arrow-info
+  sudo cp $BUILD_DIR/arrow-desc $INSTALL_DIR/arrow-desc
+fi
+
+echo
+echo Binaries placed in /usr/local/bin/

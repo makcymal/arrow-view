@@ -29,7 +29,7 @@ endif()
 set(CMAKE_CXX_FLAGS "-Wall -Werror")
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD 14)
 endif()
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,10 +44,14 @@ find_package(Arrow REQUIRED)
 
 add_executable(arrow-head src/arrow_head.cc src/utils.cc src/utils.h)
 target_link_libraries(arrow-head PRIVATE Arrow::arrow_shared)
+target_include_directories(arrow-head PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(arrow-info src/arrow_info.cc src/utils.cc src/utils.h)
 target_link_libraries(arrow-info PRIVATE Arrow::arrow_shared)
-target_link_libraries(arrow-head PRIVATE Arrow::arrow_shared)
+target_include_directories(arrow-info PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(arrow-desc src/arrow_desc.cc src/utils.cc src/utils.h)
 target_link_libraries(arrow-desc PRIVATE Arrow::arrow_shared)
+target_include_directories(arrow-desc PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+
