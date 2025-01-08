@@ -1,15 +1,30 @@
+/*
+  Apache Arrow files CLI preview:
+  Compute descriptive statistics on numerical fields, similar to
+  pandas.DataFrame.head().
+
+  This assumes that file contains only one table.
+  The output is formatted as table with tabulate lib:
+  https://github.com/p-ranav/tabulate.
+
+  The columns width is equal among data columns and is adjusted automatically
+  to fit screen entirely. However, in case of tables with a lot of columns,
+  this may result in very narrow columns and bad readability.
+
+  Takes filename as single CLI argument.
+  Usage:
+  arrow-desc data.arrow
+*/
+
 #include <arrow/array.h>
 #include <arrow/chunked_array.h>
 #include <arrow/compute/api.h>
-#include <arrow/compute/api_aggregate.h>
-#include <arrow/compute/api_scalar.h>
 #include <arrow/compute/exec.h>
 #include <arrow/result.h>
 #include <arrow/scalar.h>
 #include <arrow/status.h>
 #include <arrow/table.h>
 #include <arrow/type.h>
-#include <arrow/type_fwd.h>
 
 #include <iostream>
 #include <memory>
@@ -19,6 +34,7 @@
 #include "utils.h"
 
 
+// list of relevant descriptive statistics
 enum DescStats {
   COUNT,
   MEAN,
@@ -31,6 +47,7 @@ enum DescStats {
   ENUM_SIZE
 };
 
+// give a name to the row corresponding to the given statistics
 std::string to_string(DescStats stat) {
   switch (stat) {
     case DescStats::COUNT:
@@ -55,15 +72,19 @@ std::string to_string(DescStats stat) {
 }
 
 
+// round floats to 3 decimal places after dot
 arrow::compute::RoundOptions ROUND_OPTS(3);
+// compute 5 quantiles at once
 arrow::compute::QuantileOptions QUANTILE_OPTS({0.0, 0.25, 0.5, 0.75, 1.0});
 
 
+// count non-null entries on entire column
 arrow::Result<std::string> GetCount(
     const std::shared_ptr<arrow::ChunkedArray> &array) {
   return std::to_string(array->length() - array->null_count());
 }
 
+// compute mean on entire column
 arrow::Result<std::string> GetMean(
     const std::shared_ptr<arrow::ChunkedArray> &array) {
   ARROW_ASSIGN_OR_RAISE(auto datum, arrow::compute::Mean(array));
@@ -71,6 +92,7 @@ arrow::Result<std::string> GetMean(
   return datum.scalar()->ToString();
 }
 
+// compute standard deviation on entire columns
 arrow::Result<std::string> GetStd(
     const std::shared_ptr<arrow::ChunkedArray> &array) {
   ARROW_ASSIGN_OR_RAISE(auto datum, arrow::compute::Stddev(array));
@@ -78,6 +100,7 @@ arrow::Result<std::string> GetStd(
   return datum.scalar()->ToString();
 }
 
+// compute min, max and quartiles on entire columns
 arrow::Result<std::vector<std::string>> GetQuantiles(
     const std::shared_ptr<arrow::ChunkedArray> &array) {
   ARROW_ASSIGN_OR_RAISE(auto datum,
@@ -95,6 +118,7 @@ arrow::Result<std::vector<std::string>> GetQuantiles(
 }
 
 
+// helps to filter non numeric columns
 bool IsNumericType(const std::shared_ptr<arrow::DataType> &datatype) {
   switch (datatype->id()) {
     case arrow::Type::UINT8:
@@ -119,6 +143,7 @@ bool IsNumericType(const std::shared_ptr<arrow::DataType> &datatype) {
 }
 
 
+// get numeric fields (columns) and their indices
 std::pair<std::vector<std::shared_ptr<arrow::Field>>, std::vector<int>>
 ExtractNumericFields(const arrow::FieldVector &fields) {
   std::vector<std::shared_ptr<arrow::Field>> numer_fields;
@@ -134,14 +159,20 @@ ExtractNumericFields(const arrow::FieldVector &fields) {
 }
 
 
+// main execution function
 arrow::Status ArrowDesc(int argc, char *argv[]) {
   ARROW_ASSIGN_OR_RAISE(auto reader, OpenFileReader(argc, argv));
   auto fields = reader->schema()->fields();
   auto [numer_fields, numer_fields_idx] = ExtractNumericFields(fields);
 
-
+  // generate schema of the table without non numerical columns
   auto out_schema = arrow::schema(numer_fields);
+  // 7 (= len("count") + 2) is width of first column
   tabulate::Table out_table = InitOutTable(out_schema, 7);
+
+  // tabulate::Table is filled row by row
+  // but we compute descriptive statistics column by column
+  // so we first write output to this intermediate table of strings
   std::vector raw_out_table(numer_fields.size(),
                             std::vector<std::string>(DescStats::ENUM_SIZE));
 
@@ -164,6 +195,7 @@ arrow::Status ArrowDesc(int argc, char *argv[]) {
     raw_out_table[i][MAX] = quantiles[4];
   }
 
+  // write from intermediate table to output table
   for (int stat_idx = 0; stat_idx < DescStats::ENUM_SIZE; ++stat_idx) {
     tabulate::RowStream out_row;
     out_row << to_string(DescStats(stat_idx));
