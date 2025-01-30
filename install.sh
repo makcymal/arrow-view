@@ -4,7 +4,7 @@ SOURCE_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 cmake -S $SOURCE_DIR -B .cmake -Wno-dev
 
-make -C .cmake arrow-head arrow-info arrow-desc
+cmake --build .cmake
 
 BUILD_DIR=$SOURCE_DIR/.build
 

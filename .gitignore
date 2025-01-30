@@ -64,7 +64,7 @@ test.*
 *.arrow
 
 arrow-head
-arrow-tail
 arrow-info
 arrow-desc
 
+test/
